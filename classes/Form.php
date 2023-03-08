@@ -61,9 +61,9 @@ class Form extends Block
 
 
         //Hands away from panel!
-        if (preg_match('(api|panel)', $_SERVER['REQUEST_URI']) > 0) {
+        if (preg_match('/^\/(api|panel)\//', $_SERVER['REQUEST_URI']) > 0) {
             return false;
-        } 
+        }
 
 
 
