@@ -114,6 +114,7 @@ return [
 	'form.block.options.redirect.off'			=> "Redirect visitor",
 	'form.block.options.success_text'			=> "Confirmation text",
 	'form.block.options.success_url' 			=> "Redirect",
+	'form.block.options.attach_files' 			=> "Attach files to email",
 
 	'form.block.placeholdes.summary' 			=> "Summary",
 

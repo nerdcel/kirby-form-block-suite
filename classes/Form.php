@@ -431,7 +431,7 @@ class Form extends Block
      * @param string|NULL $body Mailtext - set custom notification body if not set
      * @param string|NULL $recipent Recipent - set custom notification email if not set
      */
-    public function sendNotification($body = NULL, $recipient = NULL)
+    public function sendNotification($body = NULL, $recipient = NULL, $fileinfos = [], $attach_files = true)
     {
         if (option('microman.formblock.disable_notify')) {
             return;
@@ -439,6 +439,14 @@ class Form extends Block
 
         if (is_null($body)) {
             $body = $this->message('notify_body');
+
+            foreach ($fileinfos as $field) {
+                $body .= "<tr><td><ul>";
+                foreach ($field as $attachment) {
+                    $body .= "<li><a href='${attachment['location']}'>" . $attachment['location'] . "</a></li>";
+                }
+                $body .= "</ul></td></tr>";
+            }
         }
 
         if (is_null($recipient)) {
@@ -446,12 +454,12 @@ class Form extends Block
         }
 
         try {
-            
+
             $emailData = [
                 'from' => option('microman.formblock.from_email'),
                 'to' => explode(';', $recipient),
                 'subject' => $this->message('notify_subject'),
-                'attachments' => $this->attachments,
+                'attachments' => $attach_files ? $this->attachments : null,
                 'body' => [
                     'text' => Str::unhtml($body),
                     'html' => $body
@@ -620,9 +628,9 @@ class Form extends Block
      */
     private function runProcess()
     {
-        
+
         if ($this->isFilled() && $this->isValid() && is_null(get('field_validation'))) {
-            
+
             $a = $this->name()->value();
 
             $this->request = new FormRequest([
@@ -630,7 +638,7 @@ class Form extends Block
                 'form_id' => $this->id(),
                 'form_name' => $this->name()->value() ?? $this->id()
             ]);
-            
+
             $request = $this->request->create( [
                 'received' => date('Y-m-d H:i:s', time()),
                 'formdata' => json_encode($this->fieldsWithPlaceholder()),
@@ -642,18 +650,19 @@ class Form extends Block
             //Reqeust not already exists
             if(!is_null($request)) {
 
-                $this->attachments = $this->request->uploadFiles($this->attachmentFields());
-                
+                $uploadedFiles = $this->request->uploadFiles($this->attachmentFields());
+                $this->attachments = $uploadedFiles['attachments'];
+
                 // Send notification mail
                 if (!option('microman.formblock.disable_notify') && !$this->isFatal() && $this->enable_notify()->isTrue()) {
-                    $this->sendNotification();
+                    $this->sendNotification(null, null, $uploadedFiles['fileinfos'], $this->attach_files()->isTrue());
                 }
-                
+
                 // Send confirmation mail
                 if (!option('microman.formblock.disable_confirmation') && !$this->isFatal() && $this->enable_confirm()->isTrue()) {
                     $this->sendConfirmation();
                 }
-                
+
                 $this->hash('true');
 
                 kirby()->trigger('formblock.success:after', [

@@ -114,6 +114,7 @@ return [
 	'form.block.options.redirect.off'  		=> "Besucher weiterleiten",
 	'form.block.options.success_text'  		=> "Bestätigungstext",
 	'form.block.options.success_url'  		=> "Weiterleitung",
+    'form.block.options.attach_files'       => "Anhänge mitsenden",
 
 	'form.block.placeholdes.summary' 		=> "Zusammenfassung",
 

@@ -16,9 +16,9 @@ notify_subject:
   type: text
   help: form.block.default.help
   width: 1/2
-  when: 
+  when:
     enable_notify: true
-    
+
 notify_body:
   label: form.block.options.notify_body
   type: textarea
@@ -26,6 +26,12 @@ notify_body:
   buttons: false
   when:
     enable_notify: true
+
+attach_files:
+  type: toggle
+  label: form.block.options.attach_files
+  width: 1/3
+  default: false
 
 line1:
   type: line

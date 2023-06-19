@@ -116,6 +116,8 @@ return [
 	'form.block.options.invalid_message'		=> "On validation error",
 	'form.block.options.fatal_message'			=> "On fatal error ",
 
+    'form.block.options.attach_files'           => "Allega file",
+
 	'form.block.placeholdes.summary' 			=> "Summary",
 
 	'form.block.message.confirm_body'			=> '<p>Thank you for your request, we will get back to you as soon as possible.</p>',

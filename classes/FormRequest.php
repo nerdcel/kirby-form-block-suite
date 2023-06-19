@@ -7,7 +7,7 @@ namespace microman;
  * @author    Roman Gsponer <kirby@microman.ch>
  * @link      https://microman.ch/
  * @copyright Roman Gsponer
- * @license   https://license.microman.ch/license/ 
+ * @license   https://license.microman.ch/license/
  */
 
 use Kirby\Cms\Page;
@@ -47,12 +47,12 @@ class FormRequest
      * Magic getter function
      *
      * @param Array $props
-     * 
+     *
      * @return mixed
      */
     public function __construct($props)
     {
-        
+
         //Get Page
         if (($props['page_id'] ?? "site") === 'site') {
             $this->page = site();
@@ -62,17 +62,17 @@ class FormRequest
 
         //Get container
         if ($props['form_id'] ?? false) {
-            
+
             //Set Container
             $this->container = $this->page->draft($props['form_id']);
-            
+
 
             //Create if not exists
             if (!$this->container) {
                 $this->createContainer($props);
             }
 
-        } 
+        }
 
         //Set current request
         if ($props['request_id'] ?? false) {
@@ -81,12 +81,12 @@ class FormRequest
 
     }
 
-   
+
     /**
      * Create Formcontainer
      *
      * @param array $props
-     * 
+     *
      * @return null
      */
     private function createContainer($props) {
@@ -97,7 +97,7 @@ class FormRequest
         $this->container = $this->page->createChild([
             'slug' => $props['form_id'],
             'template' => 'formcontainer',
-            'content' => [ 
+            'content' => [
                 'name' => $props['form_name'] ?? "",
                 'openaccordion' => "false",
             ]
@@ -109,7 +109,7 @@ class FormRequest
      * Set/Get Request
      *
      * @param string $request_id
-     * 
+     *
      * @return \Kirby\Cms\Page
      */
     private function request($request_id = null) {
@@ -117,7 +117,7 @@ class FormRequest
         if (!is_null($request_id)) {
 
             $this->request = $this->container->draft($request_id);
-            
+
         }
 
         return $this->request;
@@ -129,7 +129,7 @@ class FormRequest
      *
      * @param array $content
      * @param string $requestid
-     * 
+     *
      * @return \Kirby\Cms\Page|null
      */
     public function create($content, $requestid): \Kirby\Cms\Page|null
@@ -149,16 +149,16 @@ class FormRequest
         }
 
         return null;
-        
+
     }
 
     /**
      * Update the request as page
      *
      * @param array $input Changes
-     * 
+     *
      * @return \Kirby\Cms\Page|null
-     * 
+     *
      */
     public function update(array $input = [])
     {
@@ -177,9 +177,9 @@ class FormRequest
      * Update the formdata of the request
      *
      * @param array $input Changes
-     * 
+     *
      * @return \Kirby\Cms\Page|null
-     * 
+     *
      */
     public function updateFormdata(array $input = [])
     {
@@ -187,16 +187,16 @@ class FormRequest
         $fd = json_decode($this->request->content()->formdata()->value(), true);
         $fd = array_merge($fd, $input);
         return $this->update(['formdata' => json_encode($fd)]);
-        
+
 
     }
-    
+
 
     /**
      * Delete request
-     * 
+     *
      * @return \Kirby\Cms\Page|null
-     * 
+     *
      */
     public function delete () {
 
@@ -215,9 +215,9 @@ class FormRequest
      * Update container
      *
      * @param array $input Changes
-     * 
+     *
      * @return \Kirby\Cms\Page
-     * 
+     *
      */
 
     public function updateContainer(array $input = [])
@@ -233,9 +233,9 @@ class FormRequest
      *
      * @param array $kind Kind of infos
      * @param \Kirby\Cms\Page $container Container to init
-     * 
+     *
      * @return array|string
-     * 
+     *
      */
     public function info($kind = "count", $container = null)
     {
@@ -258,15 +258,15 @@ class FormRequest
             case 'count':
                 return $counter[0];
                 break;
-            
+
             case 'read':
                 return $counter[1];
                 break;
-            
+
             case 'fail':
                 return $counter[2];
                 break;
-            
+
             case 'state':
                 if ($this->info('read') > 0)
                     return 'new';
@@ -285,9 +285,9 @@ class FormRequest
 
                 return $text;
                 break;
-            
+
             default:
-            
+
                 return [
                     "count" => $this->info('count'),
                     "read" => $this->info('read'),
@@ -296,23 +296,23 @@ class FormRequest
                     "text" => $this->info('text'),
                 ];
         }
-                    
-        
+
+
     }
 
     /**
      * Get cinfos about request
      *
      * @param array $props Properies to add
-     * 
+     *
      * @return array|string
-     * 
+     *
      */
     public function requestsArray($props = []) {
-        
+
         $out = array();
 
-        
+
         if(is_null($this->container) || $this->container == []) {
             $container = $this->page->index(true)->template('formcontainer');
         } else {
@@ -343,7 +343,7 @@ class FormRequest
                     "state" => $this->info('array', $a),
                 ]
             ] ;
-            
+
         }
 
         return $out;
@@ -351,12 +351,12 @@ class FormRequest
 
     /**
      * Download Files in the Form
-     * 
+     *
      * @return mixed
      */
     public function uploadFiles($fields)
     {
-        
+
         $file_obj = new Files();
 
         //Become almighty
@@ -402,7 +402,7 @@ class FormRequest
                 array_push($filenames, $name);
 
                 $tmpName  = pathinfo($f['tmp_name']);
-                
+
                 $filename = $tmpName['dirname']. '/'. $name;
 
                 rename($f['tmp_name'], $filename);
@@ -433,22 +433,25 @@ class FormRequest
 
             $fileinfos[$field_slug] = $filearray;
 
-            
+
         }
 
         $this->update(['attachment' => json_encode($fileinfos)]);
 
-        return $attachments;
-        
+        return [
+            'attachments' => $attachments,
+            'fileinfos' => $fileinfos
+        ];
+
     }
 
-    /** 
-    * API from Panel 
+    /**
+    * API from Panel
     *
     * @param array $res Responding data
-    * 
+    *
     * @return mixed
-    * 
+    *
     */
     public function api($res) {
 
